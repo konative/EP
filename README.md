@@ -1,2 +1,3 @@
-# ep-server
-Backend Express App for EP 
+# EP App
+Backend Express App 
+Frontend Next.js App
