@@ -1,11 +1,17 @@
-require("dotenv").config();
-const express = require("express");
+import {} from "dotenv/config";
+import express from "express";
 const app = express();
 const port = process.env.PORT;
-const cors = require("cors");
+import { closeClientConn, getDb } from "./db/conn.js";
 
-app.use(cors());
-app.get("/", (req, res) => {
+app.get("/login", async (req, res) => {
+  try {
+    let log = await getDb();
+    console.log(log);
+    await closeClientConn();
+  } catch (error) {
+    console.log(error);
+  }
   res.send("Hello World!");
 });
 
