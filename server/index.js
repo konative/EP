@@ -3,6 +3,8 @@ import express from "express";
 const app = express();
 const port = process.env.PORT;
 import { closeClientConn, getDb } from "./db/conn.js";
+import authRoutes from "./routes/authRoutes.js";
+app.use("/", authRoutes);
 
 app.get("/login", async (req, res) => {
   try {

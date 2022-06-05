@@ -6,18 +6,31 @@ const client = new MongoClient(connectionString, {
   useUnifiedTopology: true,
 });
 
-//@param {String} db - String name of DB
-const getDb = async (db) => {
+const getDb = async () => {
   try {
-    const client = await connectToServer();
-    const dbConnection = client.db(db);
-    return dbConnection;
+    const client = await connectToClient();
+    const db = client.db("EP");
+    return db;
   } catch (err) {
     return err;
   }
 };
 
-const connectToServer = async () => {
+/**
+ * @param {String} collection - String name of Collection
+ * @returns {Object} col -
+ */
+const getColl = async (collection) => {
+  const db = await getDb();
+  try {
+    const col = db.collection(collection);
+    return col;
+  } catch (err) {
+    return err;
+  }
+};
+
+const connectToClient = async () => {
   try {
     await client.connect();
     console.log("Successfully connected to MongoDB.");
@@ -37,4 +50,4 @@ const closeClientConn = async () => {
   }
 };
 
-export { getDb, closeClientConn };
+export { getDb, closeClientConn, getColl };
