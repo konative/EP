@@ -13,6 +13,7 @@ router.post("/login", async (req, res) => {
   });
 
   // Get the username, password
+  const { username, name, title } = req.body;
 
   // Look for user in DB
 
@@ -39,6 +40,7 @@ router.post("/logout", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
+  const { username, name, title } = req.body;
   //Get username, check if exists, handle
   res.send("signup");
   //Create user model w/ data
