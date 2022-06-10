@@ -1,9 +1,8 @@
-import jsonwebtoken from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const { sign, verify } = jwt;
 import passport from "passport";
-import passportJWT from "passport-jwt";
-import { ExtractJwt } from "passport-jwt/lib";
+import { ExtractJwt, Strategy } from "passport-jwt/lib/index.js";
 import { getColl } from "../db/conn.js";
-const JWTStrategy = passportJWT.Strategy;
 
 //JWT Options
 const options = {
@@ -14,7 +13,7 @@ const options = {
 //Signup Passport Strategy
 passport.use(
   "signup",
-  new JWTStrategy(options, async (email, password, done) => {
+  new Strategy(options, async (email, password, done) => {
     try {
       const userColl = await getColl("Users");
       result = await userColl.insertOne({
@@ -37,37 +36,6 @@ passport.use(
   })
 );
 
-//Login Passport Strategy
-passport.use(
-  "login",
-  new localStrategy(
-    {
-      usernameField: "email",
-      passwordField: "password",
-    },
-    async (email, password, done) => {
-      try {
-        const userColl = await getColl("Users");
-        const movie = await userColl.findOne({ email: email });
-        console.log(movie);
-        // if (!user) {
-        //   return done(null, false, { message: "User not found" });
-        // }
-
-        // const validate = await user.isValidPassword(password);
-
-        // if (!validate) {
-        //   return done(null, false, { message: "Wrong Password" });
-        // }
-
-        return done(null, user, { message: "Logged in Successfully" });
-      } catch (error) {
-        return done(error);
-      }
-    }
-  )
-);
-
 const issueJWT = (user) => {
   const _id = user._id;
   const expiresIn = "1d";
@@ -83,6 +51,24 @@ const issueJWT = (user) => {
   return { token: "Bearer " + signedToken, expires: expiresIn };
 };
 
-export default passportConfig = () => {
-  return;
+const strategy = new Strategy(options, async (payload, done) => {
+  try {
+    const userColl = await getColl("Users");
+    //Email / password check
+    const user = await userColl.findOne({ email: email });
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, false);
+    }
+  } catch (error) {
+    return done(error, null);
+  }
+});
+
+//passport.authenticate()
+const passportConfig = (passport) => {
+  passport.use(strategy);
 };
+
+export default passportConfig;

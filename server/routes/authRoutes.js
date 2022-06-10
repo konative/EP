@@ -22,9 +22,30 @@ router.post("/logout", async (req, res) => {
 
 router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
-  //Get username, check if exists, handle
-  res.send("signup");
-  //Create user model w/ data
+
+  //Search DB for Email if it already exists
+  const userColl = await getColl("Users");
+  try {
+    let result = await userColl.insertOne({
+      email,
+      password,
+    });
+    console.log(result);
+  } catch (error) {
+    console.log("err: ");
+    console.log(error.code);
+    //If code == 11000 res in message that its duplicate email
+    //else just say failed sucks 2 b u
+  }
+
+  await closeClientConn();
+  //If not create and save email and hashed password to DB and get _id from DB
+
+  // user = {email, id}
+  //Call token = issueJWT(user)
+  // res.json({ success: true, token: token });
+  res.send("hi");
+  //else res.json({success:false})
 });
 
 export default router;
