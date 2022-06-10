@@ -1,6 +1,6 @@
-import e from "express";
 import express from "express";
 import { closeClientConn, getColl } from "../db/conn.js";
+import { issueJWT } from "../config/passportJWTConfig.js";
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -22,7 +22,6 @@ router.post("/logout", async (req, res) => {
 
 router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
-
   //Search DB for Email if it already exists
   const userColl = await getColl("Users");
   try {
@@ -30,22 +29,22 @@ router.post("/signup", async (req, res) => {
       email,
       password,
     });
-    console.log(result);
+    var user = { email, _id: result.insertedId };
+    var issuedToken = issueJWT(user);
+    res.json({
+      success: true,
+      token: issuedToken.token,
+      expiresIn: issuedToken.expires,
+    });
   } catch (error) {
-    console.log("err: ");
-    console.log(error.code);
-    //If code == 11000 res in message that its duplicate email
-    //else just say failed sucks 2 b u
+    if (error.code == 11000) {
+      res.json({ success: false, message: "Email already exists.", error });
+    } else {
+      res.json({ success: false, message: "Failed to Sign Up.", error });
+    }
   }
 
   await closeClientConn();
-  //If not create and save email and hashed password to DB and get _id from DB
-
-  // user = {email, id}
-  //Call token = issueJWT(user)
-  // res.json({ success: true, token: token });
-  res.send("hi");
-  //else res.json({success:false})
 });
 
 export default router;

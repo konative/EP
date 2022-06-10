@@ -41,10 +41,11 @@ const issueJWT = (user) => {
   const expiresIn = "1d";
   const payload = {
     sub: _id,
+    email: user.email,
     iat: Date.now(),
   };
 
-  const signedToken = jsonwebtoken.sign(payload, "KEY", {
+  const signedToken = jwt.sign(payload, "KEY", {
     expiresIn: expiresIn,
   });
 
@@ -72,3 +73,4 @@ const passportConfig = (passport) => {
 };
 
 export default passportConfig;
+export { issueJWT };
