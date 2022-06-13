@@ -11,30 +11,30 @@ const options = {
 };
 
 //Signup Passport Strategy
-passport.use(
-  "signup",
-  new Strategy(options, async (email, password, done) => {
-    try {
-      const userColl = await getColl("Users");
-      result = await userColl.insertOne({
-        email,
-        password,
-      });
-      let user = {
-        id: result.insertedId,
-        email: email,
-      };
-      return done(null, user);
-    } catch (error) {
-      if (error.code == 11000) {
-        console.log("Email already exists");
-      } else {
-        console.log("Error creating/saving user");
-      }
-      done(error, null);
-    }
-  })
-);
+// passport.use(
+//   "signup",
+//   new Strategy(options, async (email, password, done) => {
+//     try {
+//       const userColl = await getColl("Users");
+//       result = await userColl.insertOne({
+//         email,
+//         password,
+//       });
+//       let user = {
+//         id: result.insertedId,
+//         email: email,
+//       };
+//       return done(null, user);
+//     } catch (error) {
+//       if (error.code == 11000) {
+//         console.log("Email already exists");
+//       } else {
+//         console.log("Error creating/saving user");
+//       }
+//       done(error, null);
+//     }
+//   })
+// );
 
 const issueJWT = (user) => {
   const _id = user._id;

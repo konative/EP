@@ -4,12 +4,30 @@ import { issueJWT } from "../config/passportJWTConfig.js";
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
   const userColl = await getColl("Users");
-  let result;
-
-  console.log(JSON.stringify(simp?.insertedId));
-  res.send("login");
-
+  try {
+    let result = await userColl.findOne({ email });
+    console.log(result);
+    if (!result) {
+      res.json({ success: false, message: "User not found" });
+    } else if (result && result.password != password) {
+      res.json({ success: false, message: "Incorrect password" });
+    } else {
+      var user = { email, _id: result.insertedId };
+      var issuedToken = issueJWT(user);
+      res.json({
+        success: true,
+        token: issuedToken.token,
+        expiresIn: issuedToken.expires,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    if (error) {
+      res.json({ success: false, message: "Login Failed", error });
+    }
+  }
   //Close connection at end?
   await closeClientConn();
 });
