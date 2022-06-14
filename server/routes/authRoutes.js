@@ -5,6 +5,10 @@ const router = express.Router();
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    res.json({ success: false, message: "Email or Password cannot be null" });
+    return;
+  }
   const userColl = await getColl("Users");
   try {
     let result = await userColl.findOne({ email });
@@ -40,6 +44,10 @@ router.post("/logout", async (req, res) => {
 
 router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    res.json({ success: false, message: "Email or Password cannot be null" });
+    return;
+  }
   //Search DB for Email if it already exists
   const userColl = await getColl("Users");
   try {
