@@ -54,7 +54,7 @@ router.post("/signup", async (req, res) => {
   // console.log(newUser);
   // console.log(!newUser.success);
   // console.log(newUser.success);
-  console.log(newUser.error.error);
+  //console.log(newUser.error.error);
 
   if (newUser.success === false) {
     return res.json(newUser);
