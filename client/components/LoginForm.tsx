@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
 
 export default function LoginForm({ setToken }) {
   const [email, setEmail] = useState('Email')
@@ -16,11 +15,12 @@ export default function LoginForm({ setToken }) {
   }
 
   async function handleSubmit() {
-    // const token = await loginUser({
-    //   email,
-    //   password,
-    // })
-    // setToken(token)
+    const token = await loginUser({
+    email,
+    password,
+    })
+    console.log("hello")
+    setToken(token)
   }
 
   return (
@@ -38,14 +38,14 @@ export default function LoginForm({ setToken }) {
             <input
               className="w-full"
               type="email"
-              name="name"
+              name="email"
               placeholder={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <input
               className="w-full"
               type="password"
-              name="name"
+              name="password"
               placeholder={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -56,8 +56,4 @@ export default function LoginForm({ setToken }) {
       </div>
     </div>
   )
-}
-
-LoginForm.propTypes = {
-  setToken: PropTypes.func.isRequired,
 }
