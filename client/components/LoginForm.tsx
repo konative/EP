@@ -16,10 +16,9 @@ export default function LoginForm({ setToken }) {
 
   async function handleSubmit() {
     const token = await loginUser({
-    email,
-    password,
+      email,
+      password,
     })
-    console.log("hello")
     setToken(token)
   }
 
