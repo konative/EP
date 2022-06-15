@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 * {
-  @apply border border-rose-300;
+  /* @apply border border-rose-300; */
 }
