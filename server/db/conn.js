@@ -44,6 +44,7 @@ const connectToClient = async () => {
 const closeClientConn = async () => {
   try {
     await client.close();
+    console.log("Successfully closed MongoDB connection.");
   } catch (err) {
     console.log("Error closing client conn");
     return err;

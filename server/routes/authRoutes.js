@@ -1,6 +1,7 @@
 import express from "express";
 import { closeClientConn, getColl } from "../db/conn.js";
 import { issueJWT } from "../config/passportJWTConfig.js";
+import { createUser } from "../util/DB/users.js";
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -49,25 +50,26 @@ router.post("/signup", async (req, res) => {
     return;
   }
   //Search DB for Email if it already exists
-  const userColl = await getColl("Users");
+  const newUser = await createUser(email, password);
+  // console.log(newUser);
+  // console.log(!newUser.success);
+  // console.log(newUser.success);
+  console.log(newUser.error.error);
+
+  if (newUser.success === false) {
+    return res.json(newUser);
+  }
   try {
-    let result = await userColl.insertOne({
-      email,
-      password,
-    });
-    var user = { email, _id: result.insertedId };
+    var user = { email, _id: newUser.insertedId };
     var issuedToken = issueJWT(user);
+    //console.log("TEEESSTTT");
     res.json({
       success: true,
       token: issuedToken.token,
       expiresIn: issuedToken.expires,
     });
   } catch (error) {
-    if (error.code == 11000) {
-      res.json({ success: false, message: "Email already exists.", error });
-    } else {
-      res.json({ success: false, message: "Failed to Sign Up.", error });
-    }
+    res.json({ success: false, message: "Failed to Sign Up.", error });
   }
 
   await closeClientConn();
