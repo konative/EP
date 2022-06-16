@@ -1,6 +1,7 @@
 import express from "express";
 import { closeClientConn, getColl } from "../db/conn.js";
 import { issueJWT } from "../config/passportJWTConfig.js";
+import passport from "passport";
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -72,5 +73,13 @@ router.post("/signup", async (req, res) => {
 
   await closeClientConn();
 });
+
+router.get(
+  "/protected",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.send("potato");
+  }
+);
 
 export default router;

@@ -56,7 +56,7 @@ const strategy = new Strategy(options, async (payload, done) => {
   try {
     const userColl = await getColl("Users");
     //Email / password check
-    const user = await userColl.findOne({ email: email });
+    const user = await userColl.findOne({ email: payload.email });
     if (user) {
       return done(null, user);
     } else {

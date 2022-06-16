@@ -2,8 +2,7 @@ import {} from "dotenv/config";
 import express from "express";
 const app = express();
 const port = process.env.PORT;
-import { closeClientConn, getDb } from "./db/conn.js";
-import authRoutes from "./routes/authRoutes.js";
+import routes from "./routes/index.js";
 import passportConfig from "./config/passportJWTConfig.js";
 import passport from "passport";
 
@@ -11,7 +10,7 @@ passportConfig(passport);
 app.use(passport.initialize());
 app.use(express.json());
 
-app.use("/", authRoutes);
+app.use("/", routes);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
