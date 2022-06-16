@@ -2,20 +2,15 @@ import {} from "dotenv/config";
 import express from "express";
 const app = express();
 const port = process.env.PORT;
-import { closeClientConn, getDb } from "./db/conn.js";
-import authRoutes from "./routes/authRoutes.js";
-app.use("/", authRoutes);
+import routes from "./routes/index.js";
+import passportConfig from "./config/passportJWTConfig.js";
+import passport from "passport";
 
-app.get("/login", async (req, res) => {
-  try {
-    let log = await getDb();
-    console.log(log);
-    await closeClientConn();
-  } catch (error) {
-    console.log(error);
-  }
-  res.send("Hello World!");
-});
+passportConfig(passport);
+app.use(passport.initialize());
+app.use(express.json());
+
+app.use("/", routes);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

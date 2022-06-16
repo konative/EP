@@ -1,34 +1,38 @@
 import express from "express";
 import { closeClientConn, getColl } from "../db/conn.js";
+import { issueJWT } from "../config/passportJWTConfig.js";
+import passport from "passport";
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res.json({ success: false, message: "Email or Password cannot be null" });
+    return;
+  }
   const userColl = await getColl("Users");
-  await userColl.insertOne({
-    usrName: "John Doe",
-    usrDept: "Sales",
-    usrTitle: "Executive Account Manager",
-    authLevel: 4,
-    authDept: ["Sales", "Customers"],
-  });
-
-  // Get the username, password
-  const { username, name, title } = req.body;
-
-  // Look for user in DB
-
-  //If !user return error
-
-  //Else retrieve user password
-
-  //Compare password, if match return success
-
-  //Issue token upon success
-
-  //Else return error
-
-  res.send("login");
-
+  try {
+    let result = await userColl.findOne({ email });
+    console.log(result);
+    if (!result) {
+      res.json({ success: false, message: "User not found" });
+    } else if (result && result.password != password) {
+      res.json({ success: false, message: "Incorrect password" });
+    } else {
+      var user = { email, _id: result.insertedId };
+      var issuedToken = issueJWT(user);
+      res.json({
+        success: true,
+        token: issuedToken.token,
+        expiresIn: issuedToken.expires,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    if (error) {
+      res.json({ success: false, message: "Login Failed", error });
+    }
+  }
   //Close connection at end?
   await closeClientConn();
 });
@@ -40,10 +44,42 @@ router.post("/logout", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const { username, name, title } = req.body;
-  //Get username, check if exists, handle
-  res.send("signup");
-  //Create user model w/ data
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res.json({ success: false, message: "Email or Password cannot be null" });
+    return;
+  }
+  //Search DB for Email if it already exists
+  const userColl = await getColl("Users");
+  try {
+    let result = await userColl.insertOne({
+      email,
+      password,
+    });
+    var user = { email, _id: result.insertedId };
+    var issuedToken = issueJWT(user);
+    res.json({
+      success: true,
+      token: issuedToken.token,
+      expiresIn: issuedToken.expires,
+    });
+  } catch (error) {
+    if (error.code == 11000) {
+      res.json({ success: false, message: "Email already exists.", error });
+    } else {
+      res.json({ success: false, message: "Failed to Sign Up.", error });
+    }
+  }
+
+  await closeClientConn();
 });
+
+router.get(
+  "/protected",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.send("potato");
+  }
+);
 
 export default router;
