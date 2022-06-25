@@ -40,6 +40,13 @@ const registerUser = async (req, res) => {
       .json({ success: false, message: "Email or Password cannot be null" });
     return;
   }
+  if (!validateEmail(email))
+    return res.status(400).json({ success: false, message: "Invalid Email" });
+  if (!validatePassword(password))
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid Password" });
+
   //Search DB for Email if it already exists
   const userColl = await getColl("Users");
   try {
@@ -67,6 +74,20 @@ const registerUser = async (req, res) => {
   }
 
   await closeClientConn();
+};
+
+const validateEmail = (email) => {
+  if (typeof email !== "string") return false;
+  let regEx =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/;
+  console.log(email.match(regEx));
+  return email.match(regEx) ? true : false;
+};
+
+const validatePassword = (password) => {
+  if (typeof password !== "string") return false;
+  if (password.length < 9) return false;
+  return true;
 };
 
 export { loginUser, registerUser };
