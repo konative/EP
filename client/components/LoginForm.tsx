@@ -5,16 +5,23 @@ export default function LoginForm({ setToken }) {
   const [password, setPassword] = useState('Password')
 
   async function loginUser(credentials) {
-    return fetch('http://localhost:5000/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    }).then((data) => data.json())
+    try {
+      var response = await fetch('http://localhost:5000/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      })
+      let parsedRes = await response.json()
+      console.log(parsedRes)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(event) {
+    event.preventDefault()
     const token = await loginUser({
       email,
       password,
@@ -38,7 +45,11 @@ export default function LoginForm({ setToken }) {
             big man ting yeah its not looking good brev
           </div>
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-5"
+          method="POST"
+        >
           <label htmlFor="" className="flex flex-col gap-5 pb-6">
             <input
               className="h-12 w-full rounded-2xl pl-8 text-2xl outline outline-1 outline-blue-600"
